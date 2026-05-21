@@ -1,0 +1,1 @@
+{"version":3,"file":"ledger.js","sourceRoot":"","sources":["../../src/factory/ledger.ts"],"names":[],"mappings":"AAEA,MAAM,UAAU,YAAY,CAC1B,KAAmB,EACnB,KAA+C;IAE/C,KAAK,CAAC,MAAM,CAAC,IAAI,CAAC;QAChB,KAAK,EAAE,KAAK,CAAC,KAAK;QAClB,SAAS,EAAE,IAAI,IAAI,EAAE,CAAC,WAAW,EAAE;QACnC,GAAG,KAAK;KACT,CAAC,CAAC;AACL,CAAC"}

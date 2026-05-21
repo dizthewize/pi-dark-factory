@@ -39,7 +39,7 @@ interface RolesBridgeClient {
 }
 
 /** Create a callable bridge wrapper using EventBus request/response pattern. */
-function createBridgeClient<T extends Record<string, (...args: any[]) => Promise<any>>(
+function createBridgeClient<T extends Record<string, (...args: any[]) => Promise<any> > (
   pi: ExtensionAPI,
   service: string,
   methods: string[]
