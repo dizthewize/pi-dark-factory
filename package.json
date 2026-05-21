@@ -1,0 +1,36 @@
+{
+  "name": "pi-dark-factory",
+  "version": "0.1.0",
+  "description": "Self-managing orchestrator for Pi. Reads queues, plans workflows, dispatches agents, and loops autonomously.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test --import jiti/register 'src/**/*.test.ts'",
+    "test:all": "node --test --import jiti/register 'src/**/*.test.ts' 'test/**/*.test.ts'",
+    "test:ci": "CI=true node --test --import jiti/register 'src/**/*.test.ts' 'test/**/*.test.ts'"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "orchestrator",
+    "dark-factory",
+    "autonomous"
+  ],
+  "files": [
+    "src/**/*.ts",
+    "*.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.74.0"
+  },
+  "optionalDependencies": {
+    "pi-agent-roles": ">=0.1.0",
+    "pi-mesh": ">=0.1.0",
+    "pi-workflows": ">=0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.19",
+    "jiti": "^2.7.0"
+  },
+  "license": "MIT"
+}

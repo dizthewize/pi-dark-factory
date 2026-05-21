@@ -1,0 +1,17 @@
+{
+  "append": [
+    {
+      "title": "Add OAuth login",
+      "description": "Implement Google and GitHub OAuth 2.0 authentication flow with JWT tokens.",
+      "priority": "high",
+      "roleId": "planner"
+    },
+    {
+      "title": "Security audit",
+      "description": "Audit new OAuth endpoints for token leakage, CSRF, and redirect URI validation.",
+      "priority": "critical",
+      "roleId": "security-auditor"
+    }
+  ],
+  "clearAfterRead": true
+}
