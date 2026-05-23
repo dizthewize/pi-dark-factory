@@ -26,6 +26,7 @@ import { startFileWatcher, pollManualQueue } from "../factory/watcher.js";
 import { pollGitHubIssues } from "../factory/github-source.js";
 import { scanMeshInbox } from "../factory/mesh-inbox.js";
 import { createFactoryBridges, bridgesToCycleDeps } from "../factory/bridges.js";
+import { formatFactoryDashboard, formatFactoryCompact } from "../factory/dashboard.js";
 
 const FACTORY_DIR = path.join(os.homedir(), ".pi", "agent", "factory");
 const GITHUB_CONFIG_PATH = path.join(FACTORY_DIR, "github-config.json");
