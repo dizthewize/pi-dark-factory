@@ -10,6 +10,38 @@ pi package add pi-dark-factory
 
 **Optional dependencies:** `pi-workflows`, `pi-mesh`, `pi-agent-roles`. The factory works standalone but does more with them.
 
+## Architecture
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    pi-dark-factory (Foreman)                   │
+│                                                                │
+│  Queue → Plan → execute_workflow() → Review → Ledger         │
+│       ↑                                    ↓                   │
+│       └────── pi-mesh broadcasts ──────────┘                   │
+└────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────┐
+│                      pi-mesh (Factory Floor)                   │
+│                                                                │
+│  Agents: ● working  ○ idle  |  Tasks: 🔴 claimed  🟡 open     │
+│  Reservations: file locks  |  Messages: broadcasts, DMs      │
+│  Widget: auto-shows when agents active (2s poll)               │
+└────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────┐
+│                    pi-workflows (Assembly Line)                │
+│                                                                │
+│  Wave 1: types.ts ●  service.ts ●  middleware ○               │
+│  Widget: auto-shows during execute_workflow()                 │
+│  Cost tracking | Review gates | File reservations               │
+└────────────────────────────────────────────────────────────────┘
+```
+
+**Full architecture diagram:** [`docs/architecture.md`](docs/architecture.md)
+
 ## Core Concepts
 
 | Concept | Description |
@@ -91,7 +123,23 @@ pi_factory({ action: "start", costLimit: 50 })
 // → write to queue.manual.json → auto-detected
 
 // 4. Check status
-pi_factory({ action: "status" })
+/factory status
+// → renders full dashboard:
+//    ● Factory working │ cycle 3 │ cost $1.24 / $15.00 (8%) │ last 2m
+//    ────────────────────────────────────────────────────────────────
+//    ● FACT-001  Build auth service  executing  2m  $0.08
+//    ────────────────────────────────────────────────────────────────
+//    Queue (5 total):
+//      🟠 FACT-002  Add OAuth UI       high    manual
+//      🟡 FACT-003  Setup database      medium  mesh
+//      🟡 FACT-004  Write tests         medium  file
+//      ... and 2 more
+//    ────────────────────────────────────────────────────────────────
+//    History: ✓ 2 done  |  ✗ 0 failed
+//    Recent activity:
+//      ✓ FACT-001 complete  $0.08
+//      📋 FACT-002 plan     $0.02
+//      ▶ FACT-001 execute   $0.06
 ```
 
 ## All Actions
