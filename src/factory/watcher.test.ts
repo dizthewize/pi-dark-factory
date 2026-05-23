@@ -1,9 +1,8 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
 import { pollManualQueue, startFileWatcher } from "./watcher.js";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { describe, it, expect } from "vitest";
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), "factory-watcher-test-"));
@@ -13,7 +12,7 @@ describe("pollManualQueue", () => {
   it("returns null when file missing", () => {
     const tmp = tmpDir();
     const result = pollManualQueue(tmp);
-    assert.strictEqual(result, null);
+    expect(result).toBe(null);
   });
 
   it("reads tasks and clears file", () => {
@@ -31,15 +30,15 @@ describe("pollManualQueue", () => {
     );
 
     const tasks = pollManualQueue(tmp);
-    assert.ok(tasks);
-    assert.strictEqual(tasks!.length, 2);
-    assert.strictEqual(tasks![0].title, "Add auth");
-    assert.strictEqual(tasks![0].priority, "high");
-    assert.strictEqual(tasks![1].roleId, "bug-reproducer");
+    expect(tasks).toBeTruthy();
+    expect(tasks!.length).toBe(2);
+    expect(tasks![0].title).toBe("Add auth");
+    expect(tasks![0].priority).toBe("high");
+    expect(tasks![1].roleId).toBe("bug-reproducer");
 
     // File should be cleared
     const cleared = JSON.parse(fs.readFileSync(queuePath, "utf-8"));
-    assert.deepStrictEqual(cleared.append, []);
+    expect(cleared.append).toStrictEqual([]);
   });
 
   it("generates ids when missing", () => {
@@ -50,7 +49,7 @@ describe("pollManualQueue", () => {
       "utf-8"
     );
     const tasks = pollManualQueue(tmp);
-    assert.ok(tasks![0].id.startsWith("MAN-"));
+    expect(tasks![0].id.startsWith("MAN-")).toBeTruthy();
   });
 });
 
@@ -67,7 +66,7 @@ describe("startFileWatcher", () => {
 
     // Wait first poll
     await new Promise((r) => setTimeout(r, 150));
-    assert.strictEqual(captured.length, 0);
+    expect(captured.length).toBe(0);
 
     // Write queue file
     fs.writeFileSync(
@@ -80,7 +79,7 @@ describe("startFileWatcher", () => {
     await new Promise((r) => setTimeout(r, 200));
 
     stop();
-    assert.strictEqual(captured.length, 1);
-    assert.strictEqual(captured[0][0].title, "New");
+    expect(captured.length).toBe(1);
+    expect(captured[0][0].title).toBe("New");
   });
 });

@@ -39,11 +39,11 @@ interface RolesBridgeClient {
 }
 
 /** Create a callable bridge wrapper using EventBus request/response pattern. */
-function createBridgeClient<T extends Record<string, (...args: any[]) => Promise<any> > (
+function createBridgeClient(
   pi: ExtensionAPI,
   service: string,
   methods: string[]
-): Partial<T> {
+): any {
   const client: Record<string, any> = {};
   for (const method of methods) {
     client[method] = async (params: unknown) => {
@@ -78,7 +78,7 @@ function createBridgeClient<T extends Record<string, (...args: any[]) => Promise
       });
     };
   }
-  return client as Partial<T>;
+  return client;
 }
 
 export interface FactoryBridges {

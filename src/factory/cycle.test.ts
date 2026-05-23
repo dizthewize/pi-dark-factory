@@ -1,11 +1,10 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
 import { runOneCycle } from "./cycle.js";
 import { StateStore } from "./state.js";
 import { FactoryTask } from "../types.js";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { describe, it, expect } from "vitest";
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), "factory-cycle-test-"));
@@ -24,8 +23,8 @@ describe("runOneCycle", () => {
     const store = new StateStore({ factoryDir: tmp });
     store.save(store.load());
     const { didWork, state } = await runOneCycle({ stateStore: store, factoryDir: tmp, cwd: "/tmp" });
-    assert.strictEqual(didWork, false);
-    assert.strictEqual(state.status, "idle");
+    expect(didWork).toBe(false);
+    expect(state.status).toBe("idle");
   });
 
   it("planning fallback works when no bridges available", async () => {
@@ -38,12 +37,12 @@ describe("runOneCycle", () => {
     // With no piWorkflows or piAgentRoles bridges, fallback planner generates minimal spec
     // Then executor fails (no piWorkflows.execute), first retry queues it back
     const { didWork, state } = await runOneCycle({ stateStore: store, factoryDir: tmp, cwd: "/tmp" });
-    assert.strictEqual(didWork, true);
+    expect(didWork).toBeTruthy();
     // Task gets a plan from fallback
     const t1 = state.queue.find((t) => t.id === "t1") ?? state.failed.find((t) => t.id === "t1");
-    assert.ok(t1, "task should exist in queue or failed");
+    expect(t1).toBeTruthy();
     // Plan path was written
-    assert.ok(t1.planPath);
+    expect(t1.planPath).toBeTruthy();
   });
 
   it("respects cost cap", async () => {
@@ -55,8 +54,8 @@ describe("runOneCycle", () => {
     s.queue.push(makeTask("t1", "high"));
     store.save(s);
     const { didWork, state } = await runOneCycle({ stateStore: store, factoryDir: tmp, cwd: "/tmp" });
-    assert.strictEqual(didWork, false);
-    assert.strictEqual(state.status, "cost_exceeded");
+    expect(didWork).toBe(false);
+    expect(state.status).toBe("cost_exceeded");
   });
 
   it("respects paused status", async () => {
@@ -67,7 +66,7 @@ describe("runOneCycle", () => {
     s.queue.push(makeTask("t1", "high"));
     store.save(s);
     const { didWork, state } = await runOneCycle({ stateStore: store, factoryDir: tmp, cwd: "/tmp" });
-    assert.strictEqual(didWork, false);
-    assert.strictEqual(state.status, "paused");
+    expect(didWork).toBe(false);
+    expect(state.status).toBe("paused");
   });
 });

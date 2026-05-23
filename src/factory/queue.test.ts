@@ -1,7 +1,6 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
 import { pickNextTask, addTask, removeTask } from "./queue.js";
 import { FactoryTask } from "../types.js";
+import { describe, it, expect } from "vitest";
 
 function makeTask(id: string, priority: FactoryTask["priority"], status: FactoryTask["status"] = "pending"): FactoryTask {
   return {
@@ -17,7 +16,7 @@ describe("Queue", () => {
     q.push(makeTask("b", "high"));
     q.push(makeTask("c", "critical"));
     const next = pickNextTask(q);
-    assert.strictEqual(next?.id, "c");
+    expect(next?.id).toBe("c");
   });
 
   it("skips non-pending tasks", () => {
@@ -25,22 +24,22 @@ describe("Queue", () => {
     q.push(makeTask("a", "critical", "complete"));
     q.push(makeTask("b", "low", "pending"));
     const next = pickNextTask(q);
-    assert.strictEqual(next?.id, "b");
+    expect(next?.id).toBe("b");
   });
 
   it("adds task with defaults", () => {
     const q: FactoryTask[] = [];
     const t = addTask(q, { id: "x", source: "manual", title: "X", description: "d", priority: "medium" });
-    assert.strictEqual(t.status, "pending");
-    assert.strictEqual(t.retryCount, 0);
-    assert.strictEqual(q.length, 1);
+    expect(t.status).toBe("pending");
+    expect(t.retryCount).toBe(0);
+    expect(q.length).toBe(1);
   });
 
   it("removes task by id", () => {
     const q: FactoryTask[] = [];
     q.push(makeTask("a", "low"));
-    assert.strictEqual(removeTask(q, "a"), true);
-    assert.strictEqual(q.length, 0);
-    assert.strictEqual(removeTask(q, "ghost"), false);
+    expect(removeTask(q, "a")).toBe(true);
+    expect(q.length).toBe(0);
+    expect(removeTask(q, "ghost")).toBe(false);
   });
 });

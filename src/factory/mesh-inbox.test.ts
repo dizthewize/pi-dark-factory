@@ -1,6 +1,5 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
 import { parseMeshTask, scanMeshInbox } from "./mesh-inbox.js";
+import { describe, it, expect } from "vitest";
 
 describe("parseMeshTask", () => {
   it("parses TASK: directive", () => {
@@ -12,10 +11,10 @@ describe("parseMeshTask", () => {
       timestamp: "now",
     };
     const task = parseMeshTask(msg);
-    assert.ok(task);
-    assert.strictEqual(task!.title, "Add OAuth login");
-    assert.strictEqual(task!.source, "mesh");
-    assert.strictEqual(task!.priority, "medium");
+    expect(task).toBeTruthy();
+    expect(task!.title).toBe("Add OAuth login");
+    expect(task!.source).toBe("mesh");
+    expect(task!.priority).toBe("medium");
   });
 
   it("parses FACTORY: directive with priority", () => {
@@ -27,7 +26,7 @@ describe("parseMeshTask", () => {
       timestamp: "now",
     };
     const task = parseMeshTask(msg);
-    assert.strictEqual(task!.priority, "critical");
+    expect(task!.priority).toBe("critical");
   });
 
   it("returns null for regular message", () => {
@@ -38,7 +37,7 @@ describe("parseMeshTask", () => {
       body: "Hey, how are you?",
       timestamp: "now",
     };
-    assert.strictEqual(parseMeshTask(msg), null);
+    expect(parseMeshTask(msg)).toBe(null);
   });
 });
 
@@ -50,6 +49,6 @@ describe("scanMeshInbox", () => {
     ];
     const known = new Set(["MESH-msg-001"]);
     const tasks = scanMeshInbox(msgs as any, known);
-    assert.strictEqual(tasks.length, 0);
+    expect(tasks.length).toBe(0);
   });
 });

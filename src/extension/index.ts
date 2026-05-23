@@ -18,7 +18,7 @@ import { Type, type Static } from "typebox";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import { FactoryTask, FactoryAction, PiFactoryParams, PiFactoryResult } from "../types.js";
+import { FactoryTask, FactoryAction, PiFactoryParams, PiFactoryResult, FactoryMode, TaskSource } from "../types.js";
 import { StateStore } from "../factory/state.js";
 import { runOneCycle, CycleDeps } from "../factory/cycle.js";
 import { addTask, pickNextTask } from "../factory/queue.js";
@@ -39,11 +39,11 @@ const PiFactorySchema = Type.Object({
   action: FactoryActionEnum,
   maxCycles: Type.Optional(Type.Number()),
   costLimit: Type.Optional(Type.Number()),
-  mode: Type.Optional(Type.StringEnum(["oneshot", "continuous", "cron"])),
+  mode: Type.Optional(Type.String({ enum: ["oneshot", "continuous", "cron"] })),
   title: Type.Optional(Type.String()),
   description: Type.Optional(Type.String()),
-  priority: Type.Optional(Type.StringEnum(["critical", "high", "medium", "low"])),
-  source: Type.Optional(Type.StringEnum(["github-issue", "manual", "mesh", "file"])),
+  priority: Type.Optional(Type.String({ enum: ["critical", "high", "medium", "low"] })),
+  source: Type.Optional(Type.String({ enum: ["github-issue", "manual", "mesh", "file"] })),
   taskId: Type.Optional(Type.String()),
   data: Type.Optional(Type.Any()),
 });
@@ -236,16 +236,6 @@ Usage:
         details: result,
       };
     },
-
-    renderCall(args, theme) {
-      return `${theme.fg("toolTitle", "pi_factory")} ${theme.fg("accent", args.action)}`;
-    },
-
-    renderResult(result, _opts, theme) {
-      return result.isError
-        ? `${theme.fg("toolTitle", "pi_factory")} ${theme.fg("error", "error")}`
-        : `${theme.fg("toolTitle", "pi_factory")} ${theme.fg("success", "ok")}`;
-    },
   });
 
   pi.registerCommand("factory", {
@@ -292,7 +282,7 @@ async function handleFactoryAction(
   switch (params.action) {
     case "oneshot": {
       const state = stateStore.load();
-      state.mode = params.mode ?? "oneshot";
+      state.mode = (params.mode ?? "oneshot") as FactoryMode;
       if (params.costLimit) state.costLimit = params.costLimit;
       stateStore.save(state);
 
@@ -308,7 +298,7 @@ async function handleFactoryAction(
 
     case "start": {
       const state = stateStore.load();
-      state.mode = params.mode ?? "continuous";
+      state.mode = (params.mode ?? "continuous") as FactoryMode;
       if (params.costLimit) state.costLimit = params.costLimit;
       state.status = "working";
       stateStore.save(state);
@@ -372,10 +362,10 @@ async function handleFactoryAction(
       const state = stateStore.load();
       const task = addTask(state.queue, {
         id: `FACT-${String(state.queue.length + state.completed.length + state.failed.length + state.blocked.length + 1).padStart(3, "0")}`,
-        source: params.source ?? "manual",
+        source: (params.source ?? "manual") as TaskSource,
         title: params.title,
         description: params.description,
-        priority: params.priority ?? "medium",
+        priority: (params.priority ?? "medium") as "critical" | "high" | "medium" | "low",
         roleId: (params.data as any)?.roleId,
       });
       stateStore.save(state);

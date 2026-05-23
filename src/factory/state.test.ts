@@ -1,9 +1,8 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
 import { StateStore } from "./state.js";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { describe, it, expect } from "vitest";
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), "factory-state-test-"));
@@ -14,9 +13,9 @@ describe("StateStore", () => {
     const tmp = tmpDir();
     const store = new StateStore({ factoryDir: tmp });
     const state = store.load();
-    assert.strictEqual(state.status, "idle");
-    assert.strictEqual(state.cycle, 0);
-    assert.strictEqual(state.queue.length, 0);
+    expect(state.status).toBe("idle");
+    expect(state.cycle).toBe(0);
+    expect(state.queue.length).toBe(0);
   });
 
   it("saves and reloads state", () => {
@@ -27,8 +26,8 @@ describe("StateStore", () => {
     state.cycle = 5;
     store.save(state);
     const reloaded = store.load();
-    assert.strictEqual(reloaded.status, "working");
-    assert.strictEqual(reloaded.cycle, 5);
+    expect(reloaded.status).toBe("working");
+    expect(reloaded.cycle).toBe(5);
   });
 
   it("resets to default", () => {
@@ -38,7 +37,7 @@ describe("StateStore", () => {
     s.cycle = 99;
     store.save(s);
     const reset = store.reset();
-    assert.strictEqual(reset.cycle, 0);
-    assert.strictEqual(store.load().cycle, 0);
+    expect(reset.cycle).toBe(0);
+    expect(store.load().cycle).toBe(0);
   });
 });
